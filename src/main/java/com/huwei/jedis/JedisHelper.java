@@ -4,6 +4,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -76,6 +77,11 @@ public class JedisHelper {
         String result = jedis.rpop(key);
         jedis.close();
         return result;
+    }
+
+    public List<String> getList(String key){
+        Jedis jedis = pool.getResource();
+        return jedis.lrange(key,0,-1);
     }
 
     public Set<String> getKeys(String key){

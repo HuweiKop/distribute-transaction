@@ -6,6 +6,8 @@ import com.huwei.jedis.JedisHelper;
 import com.huwei.service.Service1;
 import redis.clients.jedis.Jedis;
 
+import java.util.List;
+
 /**
  * Hello world!
  *
@@ -13,20 +15,7 @@ import redis.clients.jedis.Jedis;
 public class App 
 {
     public static void main( String[] args ) throws Exception {
-        System.out.println( "Hello World!" );
-        Service1 service1 = new Service1();
-        service1.execute(1,"xxx");
-
-        MessageManager manager = new MessageManager();
-        manager.execute();
-
-        Jedis jedis = JedisHelper.getInstance().getJedis();
-        while (true) {
-            String result = jedis.rpop(RedisKey.RepeatMessage);
-            if(result==null){
-                break;
-            }
-            System.out.println("end:"+result);
-        }
+        List<String> transactionStatusJson = JedisHelper.getInstance().getList("txTestApi::1497872051534");
+        System.out.println(transactionStatusJson);
     }
 }

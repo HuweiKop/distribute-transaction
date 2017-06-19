@@ -1,8 +1,12 @@
 package com.huwei.aspect;
 
+import com.huwei.TransactionInfoThreadLocal;
 import com.huwei.annotation.MessageRecord;
 import com.huwei.api.BaseApi;
+import com.huwei.constant.TransactionStatus;
 import com.huwei.distribute.transaction.MessageRecorder;
+import com.huwei.model.TransactionInfoModel;
+import com.huwei.model.TransactionStatusModel;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -43,24 +47,28 @@ public class MessageRecordAspect {
 //            System.out.println(obj);
 //        }
 
+        Class c = jp.getTarget().getClass();
+        Component serviceAnt = (Component) c.getAnnotation(Component.class);
+        if (serviceAnt == null) {
+            throw new RuntimeException("该类需要指明 service name");
+        }
+        String serviceName = serviceAnt.value();
         try {
-            return jp.proceed();
+            Object result = jp.proceed();
+            MessageRecorder.recordTransactionStatus(serviceName,TransactionStatus.sucess);
+            return result;
         } catch (Exception ex) {
             ex.printStackTrace();
             Object[] parames = jp.getArgs();//获取目标方法体参数
             String className = jp.getTarget().getClass().getName();//获取目标类名
-            Class c = jp.getTarget().getClass();
-            Component serviceAnt = (Component) c.getAnnotation(Component.class);
-            if (serviceAnt == null) {
-                throw new RuntimeException("该类需要指明 service name");
-            }
-            String serviceName = serviceAnt.value();
             System.out.println("aspect ................" + serviceName);
             MethodSignature methodSignature = (MethodSignature) jp.getSignature();
             Method method = methodSignature.getMethod();
             BaseApi service = (BaseApi) jp.getThis();
             System.out.println(service.isRepeat());
             int processStrategy = rl.processStrategy();
+
+            MessageRecorder.recordTransactionStatus(serviceName,TransactionStatus.error);
             MessageRecorder.recordMessage(className, method.getName(), serviceName, method.getParameterTypes(),
                     parames, ex, service.isRepeat(), processStrategy);
 

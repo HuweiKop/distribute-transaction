@@ -3,9 +3,11 @@ package com.huwei.distribute.transaction;
 import com.alibaba.fastjson.JSON;
 import com.huwei.TransactionInfoThreadLocal;
 import com.huwei.constant.RedisKey;
+import com.huwei.constant.TransactionStatus;
 import com.huwei.jedis.JedisHelper;
 import com.huwei.model.MessageModel;
 import com.huwei.model.TransactionInfoModel;
+import com.huwei.model.TransactionStatusModel;
 
 /**
  * Created by huwei on 2017/6/14.
@@ -38,5 +40,17 @@ public class MessageRecorder {
         }
 
         return true;
+    }
+
+    public static void recordTransactionStatus(String serviceName, int transactionStatus){
+        TransactionStatusModel statusModel = new TransactionStatusModel();
+        statusModel.setServiceName(serviceName);
+        statusModel.setServiceStatus(transactionStatus);
+        TransactionInfoModel infoModel = TransactionInfoThreadLocal.get();
+        String key = infoModel.getTransactionName()+"::"+infoModel.getTransactionNo();
+        String json = JSON.toJSONString(statusModel);
+        System.out.println("recordTransactionStatus======================");
+        System.out.println(json);
+        JedisHelper.getInstance().lpush(key, json);
     }
 }
