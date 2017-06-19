@@ -16,6 +16,9 @@ public class MessageModel implements Serializable {
     private Integer processStrategy;
     private Long timestamp;
 
+    private String transactionName;
+    private Long transactionNo;
+
     public String getServiceName() {
         return serviceName;
     }
@@ -86,5 +89,21 @@ public class MessageModel implements Serializable {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getTransactionName() {
+        return transactionName;
+    }
+
+    public void setTransactionName(String transactionName) {
+        this.transactionName = transactionName;
+    }
+
+    public Long getTransactionNo() {
+        return transactionNo;
+    }
+
+    public void setTransactionNo(Long transactionNo) {
+        this.transactionNo = transactionNo;
     }
 }

@@ -17,14 +17,14 @@ public class Service2 extends BaseService {
     @Autowired
     IUserDao userDao;
 
-    @MessageRecord
-    @Transactional(rollbackFor=Exception.class)
+//    @MessageRecord
+    @Transactional
     public void execute(long id, String msg) throws Exception {
         System.out.println("service 2 execute........");
         User user = new User();
         user.setUsername(msg);
         userDao.insert(user);
-        System.out.println("插入成功。。。。");
-        throw new Exception("xxxx");
+        System.out.println("service 2 插入成功。。。。");
+        throw new RuntimeException("service 2 exception........");
     }
 }

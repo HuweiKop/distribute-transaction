@@ -1,4 +1,4 @@
-package com.huwei.type;
+package com.huwei.constant;
 
 /**
  * Created by huwei on 2017/6/16.

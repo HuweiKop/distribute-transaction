@@ -1,15 +1,13 @@
-package com.huwei;
+package com.huwei.aspect;
 
 import com.huwei.annotation.MessageRecord;
 import com.huwei.api.BaseApi;
 import com.huwei.distribute.transaction.MessageRecorder;
-import com.huwei.service.BaseService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
 
@@ -18,12 +16,13 @@ import java.lang.reflect.Method;
  */
 @Aspect
 @Component
+//@Order(2)
 public class MessageRecordAspect {
     //标注该方法体为后置通知，当目标方法执行成功后执行该方法体
     @Around("within(@org.springframework.stereotype.Component *) && @annotation(rl)")
     public Object recordMessage(ProceedingJoinPoint jp, MessageRecord rl) throws Throwable {
 //        Object[] parames = jp.getArgs();//获取目标方法体参数
-////        String params = parseParames(parames); //解析目标方法体的参数
+//        String params = parseParames(parames); //解析目标方法体的参数
 //        String className = jp.getTarget().getClass().getName();//获取目标类名
 //        Class c = jp.getTarget().getClass();
 //        Service serviceAnt = (Service) c.getAnnotation(Service.class);
@@ -65,7 +64,8 @@ public class MessageRecordAspect {
             MessageRecorder.recordMessage(className, method.getName(), serviceName, method.getParameterTypes(),
                     parames, ex, service.isRepeat(), processStrategy);
 
-            throw new Exception(ex);
+//            throw ex;
         }
+        return null;
     }
 }

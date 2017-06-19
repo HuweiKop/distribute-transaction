@@ -1,12 +1,11 @@
 package com.huwei.distribute.transaction;
 
 import com.alibaba.fastjson.JSON;
+import com.huwei.TransactionInfoThreadLocal;
 import com.huwei.constant.RedisKey;
 import com.huwei.jedis.JedisHelper;
 import com.huwei.model.MessageModel;
-import com.huwei.service.BaseService;
-
-import java.lang.reflect.Method;
+import com.huwei.model.TransactionInfoModel;
 
 /**
  * Created by huwei on 2017/6/14.
@@ -26,6 +25,13 @@ public class MessageRecorder {
         model.setRepeatTimes(0);
         model.setTimestamp(System.currentTimeMillis());
         model.setProcessStrategy(processStrategy);
+
+        TransactionInfoModel transactionInfo = TransactionInfoThreadLocal.get();
+        if(transactionInfo!=null) {
+            model.setTransactionName(transactionInfo.getTransactionName());
+            model.setTransactionNo(transactionInfo.getTransactionNo());
+        }
+
         String json = JSON.toJSONString(model);
         if(!repeat){
             JedisHelper.getInstance().lpush(RedisKey.Message, json);

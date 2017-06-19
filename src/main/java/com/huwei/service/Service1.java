@@ -1,6 +1,8 @@
 package com.huwei.service;
 
 import com.huwei.annotation.MessageRecord;
+import com.huwei.dao.IUserDao;
+import com.huwei.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,13 +14,25 @@ import org.springframework.transaction.annotation.Transactional;
 public class Service1 extends BaseService {
 
     @Autowired
+    IUserDao userDao;
+
+    @Autowired
     Service2 service2;
 
-    @MessageRecord
-    @Transactional(rollbackFor=Exception.class)
+//    @MessageRecord
+    @Transactional
     public void execute(long id, String msg) throws Exception {
+        User user = new User();
+        user.setUsername(msg);
+        userDao.insert(user);
         System.out.println("service 1 execute........");
-        System.out.println("id:"+id+" msg:"+msg);
-        service2.execute(id,msg);
+        System.out.println("service 1 插入成功。。。。");
+//        service2.execute(id,msg);
+        throw new RuntimeException("service 1 exception........");
+    }
+
+    @Transactional
+    public void delUser(long id){
+        userDao.delete(id);
     }
 }

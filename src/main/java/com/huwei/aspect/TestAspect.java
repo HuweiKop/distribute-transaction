@@ -1,4 +1,4 @@
-package com.huwei;
+package com.huwei.aspect;
 
 import com.huwei.annotation.MessageRecord;
 import org.aspectj.lang.ProceedingJoinPoint;
