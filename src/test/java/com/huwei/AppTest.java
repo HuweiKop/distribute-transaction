@@ -1,6 +1,7 @@
 package com.huwei;
 
 import com.huwei.annotation.MessageRecord;
+import com.huwei.api.TestApi;
 import com.huwei.constant.RedisKey;
 import com.huwei.distribute.transaction.MessageManager;
 import com.huwei.jedis.JedisHelper;
@@ -22,12 +23,14 @@ public class AppTest extends BaseTest {
     Service1 service1;
     @Autowired
     Service2 service2;
+    @Autowired
+    TestApi testApi;
 
     @Test
     public void test() {
 
         try {
-            service2.execute(1,"xxx");
+            testApi.execute(1,"xxx");
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -12,7 +12,9 @@ public class MessageModel implements Serializable {
     private Object[] parames;
     private Class<?>[] parameterTypes;
     private String exception;
-    private String repeatTimes;
+    private Integer repeatTimes;
+    private Integer processStrategy;
+    private Long timestamp;
 
     public String getServiceName() {
         return serviceName;
@@ -62,11 +64,27 @@ public class MessageModel implements Serializable {
         this.exception = exception;
     }
 
-    public String getRepeatTimes() {
+    public Integer getRepeatTimes() {
         return repeatTimes;
     }
 
-    public void setRepeatTimes(String repeatTimes) {
+    public void setRepeatTimes(Integer repeatTimes) {
         this.repeatTimes = repeatTimes;
+    }
+
+    public Integer getProcessStrategy() {
+        return processStrategy;
+    }
+
+    public void setProcessStrategy(Integer processStrategy) {
+        this.processStrategy = processStrategy;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 }

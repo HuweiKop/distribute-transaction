@@ -2,6 +2,7 @@ package com.huwei.distribute.transaction;
 
 import com.alibaba.fastjson.JSON;
 import com.huwei.ApplicationUtil;
+import com.huwei.api.BaseApi;
 import com.huwei.constant.RedisKey;
 import com.huwei.jedis.JedisHelper;
 import com.huwei.model.MessageModel;
@@ -18,22 +19,25 @@ public class MessageManager {
 
     public void execute() throws Exception {
         Jedis jedis = JedisHelper.getInstance().getJedis();
-        while (true){
+        while (true) {
             String result = jedis.rpop(RedisKey.Message);
-            if(result==null){
+            if (result == null) {
                 break;
             }
             System.out.println(result);
+            MessageModel messageModel = JSON.parseObject(result, MessageModel.class);
             try {
-                MessageModel messageModel = JSON.parseObject(result,MessageModel.class);
                 Class c = Class.forName(messageModel.getClassName());
-                Method method = c.getMethod(messageModel.getMethodName(),messageModel.getParameterTypes());
+                Method method = c.getMethod(messageModel.getMethodName(), messageModel.getParameterTypes());
                 Object[] params = messageModel.getParames();
-                BaseService service = (BaseService)ApplicationUtil.getBean(messageModel.getServiceName());
+                BaseApi service = (BaseApi) ApplicationUtil.getBean(messageModel.getServiceName());
                 service.repeat();
-                method.invoke(service,params);
+                method.invoke(service, params);
             } catch (Exception e) {
-                JedisHelper.getInstance().lpush(RedisKey.RepeatMessage, result);
+                messageModel.setTimestamp(System.currentTimeMillis());
+                messageModel.setRepeatTimes(messageModel.getRepeatTimes() + 1);
+                String modelJson = JSON.toJSONString(messageModel);
+                JedisHelper.getInstance().lpush(RedisKey.RepeatMessage, modelJson);
                 throw new Exception(e);
             }
         }

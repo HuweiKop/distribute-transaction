@@ -20,6 +20,7 @@ public class TestAspect {
             return jp.proceed();
         } catch (Exception e) {
             System.out.println("test.....catch.............");
+            System.out.println(jp.getTarget().getClass().getName());
             e.printStackTrace();
             throw new Exception(e);
         }

@@ -13,7 +13,9 @@ import java.lang.reflect.Method;
  */
 public class MessageRecorder {
 
-    public static boolean recordMessage(String className, String methodName, String serviceName,Class<?>[] paramTypes, Object[] params, Exception ex, boolean repeat){
+    public static boolean recordMessage(String className, String methodName, String serviceName,
+                                        Class<?>[] paramTypes, Object[] params, Exception ex, boolean repeat,
+                                        int processStrategy){
         MessageModel model = new MessageModel();
         model.setClassName(className);
         model.setMethodName(methodName);
@@ -21,11 +23,12 @@ public class MessageRecorder {
         model.setParames(params);
         model.setParameterTypes(paramTypes);
         model.setException(ex.getMessage());
+        model.setRepeatTimes(0);
+        model.setTimestamp(System.currentTimeMillis());
+        model.setProcessStrategy(processStrategy);
         String json = JSON.toJSONString(model);
         if(!repeat){
             JedisHelper.getInstance().lpush(RedisKey.Message, json);
-        }else {
-            JedisHelper.getInstance().lpush(RedisKey.RepeatMessage, json);
         }
 
         return true;

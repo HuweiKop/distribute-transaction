@@ -1,5 +1,7 @@
 package com.huwei.annotation;
 
+import com.huwei.type.ProcesStrategy;
+
 import java.lang.annotation.*;
 
 /**
@@ -10,4 +12,6 @@ import java.lang.annotation.*;
 @Documented
 public @interface MessageRecord {
     String value() default "";
+
+    int processStrategy() default ProcesStrategy.ReTry;
 }
