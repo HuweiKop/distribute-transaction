@@ -2,6 +2,7 @@ package com.huwei.api;
 
 import com.huwei.annotation.MessageRecord;
 import com.huwei.annotation.TransactionRecord;
+import com.huwei.constant.ProcesStrategy;
 import com.huwei.service.Service1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,8 +21,8 @@ public class TestApi extends BaseApi {
     @Autowired
     private Service1 service1;
 
-    @MessageRecord
-    @TransactionRecord("txTestApi")
+    @MessageRecord()
+    @TransactionRecord(value = "txTestApi",processStrategy= ProcesStrategy.Rollback)
     public void execute(long id, String msg) throws Exception {
         api1.execute(id,msg);
         api2.execute(id,msg);

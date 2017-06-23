@@ -19,6 +19,7 @@ public class MessageModel implements Serializable {
     private String transactionName;
     private Long transactionNo;
 
+
     public String getServiceName() {
         return serviceName;
     }

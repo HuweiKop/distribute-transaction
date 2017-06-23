@@ -3,10 +3,10 @@ package com.huwei.aspect;
 import com.huwei.TransactionInfoThreadLocal;
 import com.huwei.annotation.MessageRecord;
 import com.huwei.api.BaseApi;
+import com.huwei.constant.ProcesStrategy;
 import com.huwei.constant.TransactionStatus;
 import com.huwei.distribute.transaction.MessageRecorder;
 import com.huwei.model.TransactionInfoModel;
-import com.huwei.model.TransactionStatusModel;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -23,8 +23,8 @@ import java.lang.reflect.Method;
 //@Order(2)
 public class MessageRecordAspect {
     //标注该方法体为后置通知，当目标方法执行成功后执行该方法体
-    @Around("within(@org.springframework.stereotype.Component *) && @annotation(rl)")
-    public Object recordMessage(ProceedingJoinPoint jp, MessageRecord rl) throws Throwable {
+    @Around("within(@org.springframework.stereotype.Component *) && @annotation(mr)")
+    public Object recordMessage(ProceedingJoinPoint jp, MessageRecord mr) throws Throwable {
 //        Object[] parames = jp.getArgs();//获取目标方法体参数
 //        String params = parseParames(parames); //解析目标方法体的参数
 //        String className = jp.getTarget().getClass().getName();//获取目标类名
@@ -39,7 +39,7 @@ public class MessageRecordAspect {
 ////        String methodName = signature.substring(signature.lastIndexOf(".")+1, signature.indexOf("("));
 //        MethodSignature methodSignature = (MethodSignature) jp.getSignature();
 //        Method method = methodSignature.getMethod();
-//        String serviceName = rl.serviceName();
+//        String serviceName = mr.serviceName();
 //        String modelName = getModelName(className); //根据类名获取所属的模块
 //        System.out.println(methodName);
 //        System.out.println(signature);
@@ -53,26 +53,28 @@ public class MessageRecordAspect {
             throw new RuntimeException("该类需要指明 service name");
         }
         String serviceName = serviceAnt.value();
+        Object[] parames = jp.getArgs();//获取目标方法体参数
+        String className = jp.getTarget().getClass().getName();//获取目标类名
+        System.out.println("aspect ................" + serviceName);
+        MethodSignature methodSignature = (MethodSignature) jp.getSignature();
+        Method method = methodSignature.getMethod();
+        BaseApi service = (BaseApi) jp.getThis();
+        System.out.println(service.isRepeat());
         try {
             Object result = jp.proceed();
-            MessageRecorder.recordTransactionStatus(serviceName,TransactionStatus.sucess);
+            MessageRecorder.recordTransactionStatus(serviceName,TransactionStatus.sucess,className,mr.rollbackServiceName(),parames);
             return result;
         } catch (Exception ex) {
             ex.printStackTrace();
-            Object[] parames = jp.getArgs();//获取目标方法体参数
-            String className = jp.getTarget().getClass().getName();//获取目标类名
-            System.out.println("aspect ................" + serviceName);
-            MethodSignature methodSignature = (MethodSignature) jp.getSignature();
-            Method method = methodSignature.getMethod();
-            BaseApi service = (BaseApi) jp.getThis();
-            System.out.println(service.isRepeat());
-            int processStrategy = rl.processStrategy();
 
-            MessageRecorder.recordTransactionStatus(serviceName,TransactionStatus.error);
+            MessageRecorder.recordTransactionStatus(serviceName,TransactionStatus.error,className,mr.rollbackServiceName(),parames);
             MessageRecorder.recordMessage(className, method.getName(), serviceName, method.getParameterTypes(),
-                    parames, ex, service.isRepeat(), processStrategy);
+                    parames, ex, service.isRepeat());
 
-//            throw ex;
+            TransactionInfoModel transactionInfo = TransactionInfoThreadLocal.get();
+            if(transactionInfo.getProcessStragery()== ProcesStrategy.Rollback){
+                throw ex;
+            }
         }
         return null;
     }

@@ -5,9 +5,14 @@ import com.huwei.ApplicationUtil;
 import com.huwei.api.BaseApi;
 import com.huwei.constant.ProcesStrategy;
 import com.huwei.constant.RedisKey;
+import com.huwei.constant.TransactionStatus;
 import com.huwei.jedis.JedisHelper;
 import com.huwei.model.MessageModel;
+import com.huwei.model.TransactionInfoModel;
+import com.huwei.model.TransactionStatusModel;
 import com.huwei.service.BaseService;
+import com.huwei.util.BeanScanner;
+import com.huwei.util.MethodContainer;
 import redis.clients.jedis.Jedis;
 
 import java.lang.reflect.InvocationTargetException;
@@ -41,12 +46,22 @@ public class MessageManager {
                     messageModel.setRepeatTimes(messageModel.getRepeatTimes() + 1);
                     String modelJson = JSON.toJSONString(messageModel);
                     JedisHelper.getInstance().lpush(RedisKey.RepeatMessage, modelJson);
-                    throw new Exception(e);
+//                    throw e;
                 }
             }else if(messageModel.getProcessStrategy()==ProcesStrategy.Rollback){
                 String transactionKey = messageModel.getTransactionName()+"::"+messageModel.getTransactionNo();
                 List<String> transactionStatusJson = JedisHelper.getInstance().getList(transactionKey);
                 System.out.println(transactionStatusJson);
+                for(String json:transactionStatusJson){
+                    TransactionStatusModel transactionStatusModel = JSON.parseObject(json,TransactionStatusModel.class);
+                    if(transactionStatusModel.getServiceStatus()== TransactionStatus.sucess){
+                        Method method = MethodContainer.getRollbackMethod(transactionStatusModel.getRollbackKey());
+                        if(method!=null){
+                            Object service = ApplicationUtil.getBean(transactionStatusModel.getServiceName());
+                            method.invoke(service,transactionStatusModel.getRollbackParames());
+                        }
+                    }
+                }
             }
         }
     }

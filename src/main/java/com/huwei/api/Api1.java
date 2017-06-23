@@ -1,6 +1,7 @@
 package com.huwei.api;
 
 import com.huwei.annotation.MessageRecord;
+import com.huwei.annotation.RollbackService;
 import com.huwei.service.Service1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,12 +15,13 @@ public class Api1 extends BaseApi {
     @Autowired
     private Service1 service1;
 
-    @MessageRecord
+    @MessageRecord(rollbackServiceName = "rollback")
     public void execute(long id, String msg) throws Exception {
         service1.execute(id,msg);
     }
 
-    public void rollback(long id){
+    @RollbackService("rollback")
+    public void rollback(long id, String msg){
         service1.delUser(id);
     }
 }

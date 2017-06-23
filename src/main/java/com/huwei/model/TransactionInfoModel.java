@@ -8,6 +8,7 @@ import java.io.Serializable;
 public class TransactionInfoModel implements Serializable {
     private String transactionName;
     private Long transactionNo;
+    private int processStragery;
 
     public String getTransactionName() {
         return transactionName;
@@ -23,5 +24,13 @@ public class TransactionInfoModel implements Serializable {
 
     public void setTransactionNo(Long transactionNo) {
         this.transactionNo = transactionNo;
+    }
+
+    public int getProcessStragery() {
+        return processStragery;
+    }
+
+    public void setProcessStragery(int processStragery) {
+        this.processStragery = processStragery;
     }
 }

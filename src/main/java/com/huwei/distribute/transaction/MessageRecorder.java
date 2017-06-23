@@ -2,6 +2,7 @@ package com.huwei.distribute.transaction;
 
 import com.alibaba.fastjson.JSON;
 import com.huwei.TransactionInfoThreadLocal;
+import com.huwei.constant.ProcesStrategy;
 import com.huwei.constant.RedisKey;
 import com.huwei.constant.TransactionStatus;
 import com.huwei.jedis.JedisHelper;
@@ -15,8 +16,7 @@ import com.huwei.model.TransactionStatusModel;
 public class MessageRecorder {
 
     public static boolean recordMessage(String className, String methodName, String serviceName,
-                                        Class<?>[] paramTypes, Object[] params, Exception ex, boolean repeat,
-                                        int processStrategy){
+                                        Class<?>[] paramTypes, Object[] params, Exception ex, boolean repeat){
         MessageModel model = new MessageModel();
         model.setClassName(className);
         model.setMethodName(methodName);
@@ -26,12 +26,12 @@ public class MessageRecorder {
         model.setException(ex.getMessage());
         model.setRepeatTimes(0);
         model.setTimestamp(System.currentTimeMillis());
-        model.setProcessStrategy(processStrategy);
 
         TransactionInfoModel transactionInfo = TransactionInfoThreadLocal.get();
         if(transactionInfo!=null) {
             model.setTransactionName(transactionInfo.getTransactionName());
             model.setTransactionNo(transactionInfo.getTransactionNo());
+            model.setProcessStrategy(transactionInfo.getProcessStragery());
         }
 
         String json = JSON.toJSONString(model);
@@ -42,11 +42,18 @@ public class MessageRecorder {
         return true;
     }
 
-    public static void recordTransactionStatus(String serviceName, int transactionStatus){
+    public static void recordTransactionStatus(String serviceName, int transactionStatus, String className,
+                                               String rollbackName, Object[] parames){
         TransactionStatusModel statusModel = new TransactionStatusModel();
         statusModel.setServiceName(serviceName);
         statusModel.setServiceStatus(transactionStatus);
         TransactionInfoModel infoModel = TransactionInfoThreadLocal.get();
+
+        if(infoModel.getProcessStragery()== ProcesStrategy.Rollback){
+            statusModel.setRollbackKey(className+"::"+rollbackName);
+            statusModel.setRollbackParames(parames);
+        }
+
         String key = infoModel.getTransactionName()+"::"+infoModel.getTransactionNo();
         String json = JSON.toJSONString(statusModel);
         System.out.println("recordTransactionStatus======================");

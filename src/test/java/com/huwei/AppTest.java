@@ -30,18 +30,18 @@ public class AppTest extends BaseTest {
     public void test() {
 
         try {
-            testApi.execute(1,"xxx");
+            testApi.execute(10,"xxx");
         } catch (Exception e) {
             System.out.println("eeeeeeeeeeeeeeeeeeeee");
             e.printStackTrace();
         }
 
-//        try {
-//            MessageManager manager = new MessageManager();
-//            manager.execute();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            MessageManager manager = new MessageManager();
+            manager.execute();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
 //        Jedis jedis = JedisHelper.getInstance().getJedis();
 //        while (true) {

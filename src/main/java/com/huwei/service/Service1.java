@@ -28,11 +28,12 @@ public class Service1 extends BaseService {
         System.out.println("service 1 execute........");
         System.out.println("service 1 插入成功。。。。");
 //        service2.execute(id,msg);
-        throw new RuntimeException("service 1 exception........");
+//        throw new RuntimeException("service 1 exception........");
     }
 
     @Transactional
     public void delUser(long id){
-        userDao.delete(id);
+        System.out.println("事务补偿 id "+id);
+//        userDao.delete(id);
     }
 }

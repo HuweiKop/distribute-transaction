@@ -6,4 +6,7 @@ package com.huwei.constant;
 public class RedisKey {
     public static final String Message = "message::log";
     public static final String RepeatMessage = "message::log::repeat";
+
+    public static final String RetryList = "service::retry";
+    public static final String RollbackList = "service::rollback";
 }
