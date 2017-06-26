@@ -1,4 +1,4 @@
-package com.huwei;
+package com.huwei.threadLocal;
 
 import java.util.HashSet;
 import java.util.Set;

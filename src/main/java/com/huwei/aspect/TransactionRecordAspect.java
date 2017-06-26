@@ -1,6 +1,6 @@
 package com.huwei.aspect;
 
-import com.huwei.TransactionInfoThreadLocal;
+import com.huwei.threadLocal.TransactionInfoThreadLocal;
 import com.huwei.annotation.TransactionRecord;
 import com.huwei.model.TransactionInfoModel;
 import org.aspectj.lang.JoinPoint;

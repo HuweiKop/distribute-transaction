@@ -11,6 +11,7 @@ import com.huwei.model.MessageModel;
 import com.huwei.model.TransactionInfoModel;
 import com.huwei.model.TransactionStatusModel;
 import com.huwei.service.BaseService;
+import com.huwei.threadLocal.MessageRepeatCountThreadLocal;
 import com.huwei.util.BeanScanner;
 import com.huwei.util.MethodContainer;
 import redis.clients.jedis.Jedis;
@@ -38,14 +39,17 @@ public class MessageManager {
                     Class c = Class.forName(messageModel.getClassName());
                     Method method = c.getMethod(messageModel.getMethodName(), messageModel.getParameterTypes());
                     Object[] params = messageModel.getParames();
-                    BaseApi service = (BaseApi) ApplicationUtil.getBean(messageModel.getServiceName());
-                    service.repeat();
+                    Object service = ApplicationUtil.getBean(messageModel.getServiceName());
+//                    service.repeat();
+                    String messageKey = messageModel.getTransactionNo()+"-"+messageModel.getClassName()+"-"
+                            +messageModel.getMethodName();
+                    MessageRepeatCountThreadLocal.setRepeatCount(messageKey,messageModel.getRepeatTimes());
                     method.invoke(service, params);
                 } catch (Exception e) {
-                    messageModel.setTimestamp(System.currentTimeMillis());
-                    messageModel.setRepeatTimes(messageModel.getRepeatTimes() + 1);
-                    String modelJson = JSON.toJSONString(messageModel);
-                    JedisHelper.getInstance().lpush(RedisKey.RepeatMessage, modelJson);
+//                    messageModel.setTimestamp(System.currentTimeMillis());
+//                    messageModel.setRepeatTimes(messageModel.getRepeatTimes() + 1);
+//                    String modelJson = JSON.toJSONString(messageModel);
+//                    JedisHelper.getInstance().lpush(RedisKey.RepeatMessage, modelJson);
 //                    throw e;
                 }
             }else if(messageModel.getProcessStrategy()==ProcesStrategy.Rollback){

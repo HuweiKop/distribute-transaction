@@ -1,10 +1,11 @@
 package com.huwei.distribute.transaction;
 
 import com.alibaba.fastjson.JSON;
-import com.huwei.TransactionInfoThreadLocal;
+import com.huwei.threadLocal.MessageRecordThreadLocal;
+import com.huwei.threadLocal.MessageRepeatCountThreadLocal;
+import com.huwei.threadLocal.TransactionInfoThreadLocal;
 import com.huwei.constant.ProcesStrategy;
 import com.huwei.constant.RedisKey;
-import com.huwei.constant.TransactionStatus;
 import com.huwei.jedis.JedisHelper;
 import com.huwei.model.MessageModel;
 import com.huwei.model.TransactionInfoModel;
@@ -16,7 +17,7 @@ import com.huwei.model.TransactionStatusModel;
 public class MessageRecorder {
 
     public static boolean recordMessage(String className, String methodName, String serviceName,
-                                        Class<?>[] paramTypes, Object[] params, Exception ex, boolean repeat){
+                                        Class<?>[] paramTypes, Object[] params, Exception ex){
         MessageModel model = new MessageModel();
         model.setClassName(className);
         model.setMethodName(methodName);
@@ -34,9 +35,22 @@ public class MessageRecorder {
             model.setProcessStrategy(transactionInfo.getProcessStragery());
         }
 
-        String json = JSON.toJSONString(model);
+        String messageKey = model.getTransactionNo()+"-"+model.getClassName()+"-"
+                +model.getMethodName();
+        Integer repeatCount = MessageRepeatCountThreadLocal.getRepeatCount(messageKey);
+        System.out.println("repeat count ================"+repeatCount);
+        boolean repeat = false;
+        if(repeatCount!=null){
+            repeat = true;
+        }
+
         if(!repeat){
+            String json = JSON.toJSONString(model);
             JedisHelper.getInstance().lpush(RedisKey.Message, json);
+        }else{
+            model.setRepeatTimes(repeatCount + 1);
+            String modelJson = JSON.toJSONString(model);
+            JedisHelper.getInstance().lpush(RedisKey.RepeatMessage, modelJson);
         }
 
         return true;

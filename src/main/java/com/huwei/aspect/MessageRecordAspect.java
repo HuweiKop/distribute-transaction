@@ -1,8 +1,7 @@
 package com.huwei.aspect;
 
-import com.huwei.TransactionInfoThreadLocal;
+import com.huwei.threadLocal.TransactionInfoThreadLocal;
 import com.huwei.annotation.MessageRecord;
-import com.huwei.api.BaseApi;
 import com.huwei.constant.ProcesStrategy;
 import com.huwei.constant.TransactionStatus;
 import com.huwei.distribute.transaction.MessageRecorder;
@@ -58,8 +57,7 @@ public class MessageRecordAspect {
         System.out.println("aspect ................" + serviceName);
         MethodSignature methodSignature = (MethodSignature) jp.getSignature();
         Method method = methodSignature.getMethod();
-        BaseApi service = (BaseApi) jp.getThis();
-        System.out.println(service.isRepeat());
+//        BaseApi service = (BaseApi) jp.getThis();
         try {
             Object result = jp.proceed();
             MessageRecorder.recordTransactionStatus(serviceName,TransactionStatus.sucess,className,mr.rollbackServiceName(),parames);
@@ -69,7 +67,7 @@ public class MessageRecordAspect {
 
             MessageRecorder.recordTransactionStatus(serviceName,TransactionStatus.error,className,mr.rollbackServiceName(),parames);
             MessageRecorder.recordMessage(className, method.getName(), serviceName, method.getParameterTypes(),
-                    parames, ex, service.isRepeat());
+                    parames, ex);
 
             TransactionInfoModel transactionInfo = TransactionInfoThreadLocal.get();
             if(transactionInfo.getProcessStragery()== ProcesStrategy.Rollback){
