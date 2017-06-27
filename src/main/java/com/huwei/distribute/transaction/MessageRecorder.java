@@ -29,11 +29,12 @@ public class MessageRecorder {
         model.setTimestamp(System.currentTimeMillis());
 
         TransactionInfoModel transactionInfo = TransactionInfoThreadLocal.get();
-        if(transactionInfo!=null) {
-            model.setTransactionName(transactionInfo.getTransactionName());
-            model.setTransactionNo(transactionInfo.getTransactionNo());
-            model.setProcessStrategy(transactionInfo.getProcessStragery());
+        if(transactionInfo==null) {
+            return false;
         }
+        model.setTransactionName(transactionInfo.getTransactionName());
+        model.setTransactionNo(transactionInfo.getTransactionNo());
+        model.setProcessStrategy(transactionInfo.getProcessStragery());
 
         String messageKey = model.getTransactionNo()+"-"+model.getClassName()+"-"
                 +model.getMethodName();
@@ -47,21 +48,21 @@ public class MessageRecorder {
         if(!repeat){
             String json = JSON.toJSONString(model);
             JedisHelper.getInstance().lpush(RedisKey.Message, json);
-        }else{
-            model.setRepeatTimes(repeatCount + 1);
-            String modelJson = JSON.toJSONString(model);
-            JedisHelper.getInstance().lpush(RedisKey.RepeatMessage, modelJson);
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     public static void recordTransactionStatus(String serviceName, int transactionStatus, String className,
                                                String rollbackName, Object[] parames){
+        TransactionInfoModel infoModel = TransactionInfoThreadLocal.get();
+        if(infoModel==null){
+            return;
+        }
         TransactionStatusModel statusModel = new TransactionStatusModel();
         statusModel.setServiceName(serviceName);
         statusModel.setServiceStatus(transactionStatus);
-        TransactionInfoModel infoModel = TransactionInfoThreadLocal.get();
 
         if(infoModel.getProcessStragery()== ProcesStrategy.Rollback){
             statusModel.setRollbackKey(className+"::"+rollbackName);

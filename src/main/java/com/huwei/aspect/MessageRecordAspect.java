@@ -66,11 +66,14 @@ public class MessageRecordAspect {
             ex.printStackTrace();
 
             MessageRecorder.recordTransactionStatus(serviceName,TransactionStatus.error,className,mr.rollbackServiceName(),parames);
-            MessageRecorder.recordMessage(className, method.getName(), serviceName, method.getParameterTypes(),
-                    parames, ex);
+            boolean result = MessageRecorder.recordMessage(className, method.getName(), serviceName,
+                    method.getParameterTypes(), parames, ex);
+            if(!result){
+                throw ex;
+            }
 
             TransactionInfoModel transactionInfo = TransactionInfoThreadLocal.get();
-            if(transactionInfo.getProcessStragery()== ProcesStrategy.Rollback){
+            if(transactionInfo==null || transactionInfo.getProcessStragery()== ProcesStrategy.Rollback){
                 throw ex;
             }
         }

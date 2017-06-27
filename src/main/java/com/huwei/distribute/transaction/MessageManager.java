@@ -46,11 +46,25 @@ public class MessageManager {
                             +messageModel.getMethodName();
                     MessageRepeatCountThreadLocal.setRepeatCount(messageKey,messageModel.getRepeatTimes());
                     method.invoke(service, params);
+
+                    //重新设置事务执行状态
+                    String transactionKey = messageModel.getTransactionName()+"::"+messageModel.getTransactionNo();
+                    List<String> transactionStatusJson = JedisHelper.getInstance().getList(transactionKey);
+                    List<String> newTransactionStatusJson = new ArrayList<>();
+                    for(String json:transactionStatusJson){
+                        TransactionStatusModel transactionStatusModel = JSON.parseObject(json,TransactionStatusModel.class);
+                        if(transactionStatusModel.getServiceName().equals(messageModel.getServiceName())){
+                            transactionStatusModel.setServiceStatus(TransactionStatus.sucess);
+                        }
+                        String newJson = JSON.toJSONString(transactionStatusModel);
+                        newTransactionStatusJson.add(newJson);
+                    }
+                    JedisHelper.getInstance().setList(transactionKey,newTransactionStatusJson);
                 } catch (Exception e) {
-//                    messageModel.setTimestamp(System.currentTimeMillis());
-//                    messageModel.setRepeatTimes(messageModel.getRepeatTimes() + 1);
-//                    String modelJson = JSON.toJSONString(messageModel);
-//                    JedisHelper.getInstance().lpush(RedisKey.RepeatMessage, modelJson);
+                    messageModel.setTimestamp(System.currentTimeMillis());
+                    messageModel.setRepeatTimes(messageModel.getRepeatTimes() + 1);
+                    String modelJson = JSON.toJSONString(messageModel);
+                    JedisHelper.getInstance().lpush(RedisKey.RepeatMessage, modelJson);
 //                    throw e;
                 }
             }else if(messageModel.getProcessStrategy()==ProcesStrategy.Rollback){
@@ -74,6 +88,8 @@ public class MessageManager {
                                 }
                                 //重新设置事务执行状态
                                 JedisHelper.getInstance().setList(transactionKey,newTransactionStatusJson);
+                                messageModel.setRepeatTimes(messageModel.getRepeatTimes()+1);
+                                JedisHelper.getInstance().lpush(RedisKey.RepeatMessage, JSON.toJSONString(messageModel));
                                 throw ex;
                             }
                         }
