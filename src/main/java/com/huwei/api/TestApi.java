@@ -22,7 +22,7 @@ public class TestApi extends BaseApi {
     private Service1 service1;
 
     @MessageRecord()
-    @TransactionRecord(value = "txTestApi",processStrategy= ProcesStrategy.ReTry)
+    @TransactionRecord(value = "txTestApi",processStrategy= ProcesStrategy.Rollback)
     public void execute(long id, String msg) throws Exception {
         api1.execute(id,msg);
         api2.execute(id,msg);

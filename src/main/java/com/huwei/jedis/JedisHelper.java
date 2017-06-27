@@ -84,6 +84,15 @@ public class JedisHelper {
         return jedis.lrange(key,0,-1);
     }
 
+    public boolean setList(String key, List<String> value){
+        Jedis jedis = pool.getResource();
+        jedis.del(key);
+        for(String v:value){
+            jedis.lpush(key,v);
+        }
+        return true;
+    }
+
     public Set<String> getKeys(String key){
         Jedis jedis = pool.getResource();
         Set<String> result = jedis.keys(key+"*");

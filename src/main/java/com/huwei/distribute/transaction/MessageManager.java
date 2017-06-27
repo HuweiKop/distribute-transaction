@@ -18,6 +18,7 @@ import redis.clients.jedis.Jedis;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,16 +57,33 @@ public class MessageManager {
                 String transactionKey = messageModel.getTransactionName()+"::"+messageModel.getTransactionNo();
                 List<String> transactionStatusJson = JedisHelper.getInstance().getList(transactionKey);
                 System.out.println(transactionStatusJson);
+                List<String> newTransactionStatusJson = new ArrayList<>();
                 for(String json:transactionStatusJson){
                     TransactionStatusModel transactionStatusModel = JSON.parseObject(json,TransactionStatusModel.class);
                     if(transactionStatusModel.getServiceStatus()== TransactionStatus.sucess){
                         Method method = MethodContainer.getRollbackMethod(transactionStatusModel.getRollbackKey());
                         if(method!=null){
                             Object service = ApplicationUtil.getBean(transactionStatusModel.getServiceName());
-                            method.invoke(service,transactionStatusModel.getRollbackParames());
+                            try {
+                                method.invoke(service, transactionStatusModel.getRollbackParames());
+
+                                transactionStatusModel.setServiceStatus(TransactionStatus.error);
+                            }catch (Exception ex){
+                                for(int i=newTransactionStatusJson.size();i<transactionStatusJson.size();i++){
+                                    newTransactionStatusJson.add(transactionStatusJson.get(i));
+                                }
+                                //重新设置事务执行状态
+                                JedisHelper.getInstance().setList(transactionKey,newTransactionStatusJson);
+                                throw ex;
+                            }
                         }
                     }
+                    String newJson = JSON.toJSONString(transactionStatusModel);
+                    newTransactionStatusJson.add(newJson);
                 }
+
+                //重新设置事务执行状态
+                JedisHelper.getInstance().setList(transactionKey,newTransactionStatusJson);
             }
         }
     }
