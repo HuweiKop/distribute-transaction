@@ -29,19 +29,19 @@ public class AppTest extends BaseTest {
     @Test
     public void test() {
 
-//        try {
-//            testApi.execute(10,"xxx");
-//        } catch (Exception e) {
-//            System.out.println("eeeeeeeeeeeeeeeeeeeee");
-//            e.printStackTrace();
-//        }
-
         try {
-            MessageManager manager = new MessageManager();
-            manager.execute();
+            testApi.execute(10,"xxx");
         } catch (Exception e) {
+            System.out.println("eeeeeeeeeeeeeeeeeeeee");
             e.printStackTrace();
         }
+
+//        try {
+//            MessageManager manager = new MessageManager();
+//            manager.execute();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
 
 //        Jedis jedis = JedisHelper.getInstance().getJedis();
 //        while (true) {

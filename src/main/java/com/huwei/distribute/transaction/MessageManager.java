@@ -34,6 +34,10 @@ public class MessageManager {
             System.out.println(result);
             MessageModel messageModel = JSON.parseObject(result, MessageModel.class);
             BaseProcessStrategy strategy = ProcessStrategyFactory.getProcessStrategy(messageModel.getProcessStrategy());
+            if(strategy==null){
+                System.out.println("没有注册该 处理策略:"+messageModel.getProcessStrategy());
+                break;
+            }
             strategy.processing(messageModel);
         }
     }
