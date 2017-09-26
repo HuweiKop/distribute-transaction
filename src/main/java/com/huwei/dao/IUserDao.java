@@ -11,4 +11,6 @@ public interface IUserDao {
 
     @Delete("delete from user where id=#{id}")
     int delete(long id);
+
+    int update(User user);
 }

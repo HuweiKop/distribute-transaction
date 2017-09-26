@@ -31,6 +31,13 @@ public class Service1 extends BaseService {
 //        throw new RuntimeException("service 1 exception........");
     }
 
+    public void update(Integer id, String username){
+        User user = new User();
+        user.setUsername(username);
+        user.setId(id);
+        userDao.update(user);
+    }
+
     @Transactional
     public void delUser(long id){
         System.out.println("事务补偿 id "+id);

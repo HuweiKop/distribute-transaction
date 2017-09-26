@@ -74,7 +74,7 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
     public SqlSessionFactory sqlSessionFactoryBean() {
         SqlSessionFactoryBean bean = new SqlSessionFactoryBean();
         bean.setDataSource(dataSource);
-        bean.setTypeAliasesPackage("com.hw.mybatis.test.model");
+//        bean.setTypeAliasesPackage("com.hw.mybatis.test.model");
 
         UpdateInterceptor updateInterceptor = new UpdateInterceptor();
 

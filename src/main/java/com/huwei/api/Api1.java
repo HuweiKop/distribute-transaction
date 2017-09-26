@@ -22,6 +22,10 @@ public class Api1 extends BaseApi {
         service1.execute(id,msg);
     }
 
+    public void update(int id, String username){
+        service1.update(id,username);
+    }
+
     @RollbackService("rollback")
     public void rollback(long id, String msg){
         service1.delUser(id);

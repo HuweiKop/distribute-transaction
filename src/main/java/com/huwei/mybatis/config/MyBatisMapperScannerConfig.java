@@ -46,7 +46,7 @@ public class MyBatisMapperScannerConfig {
     public static MapperScannerConfigurer  mapperScannerConfigurer() {
         MapperScannerConfigurer mapperScannerConfigurer = new MapperScannerConfigurer();
         mapperScannerConfigurer.setSqlSessionFactoryBeanName("sqlSessionFactory");
-        mapperScannerConfigurer.setBasePackage("com.hw.mybatis.test.dao");
+        mapperScannerConfigurer.setBasePackage("com.huwei.dao");
         Properties properties = new Properties();
         //不能放到basePackage中。
 //        properties.setProperty("mappers", "com.ptb.pay.mapper.MyMapper");
