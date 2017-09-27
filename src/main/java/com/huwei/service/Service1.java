@@ -31,6 +31,7 @@ public class Service1 extends BaseService {
 //        throw new RuntimeException("service 1 exception........");
     }
 
+    @Transactional
     public void update(Integer id, String username){
         User user = new User();
         user.setUsername(username);

@@ -13,4 +13,6 @@ import java.util.List;
 public abstract class BaseAnalysis {
 
     public abstract List<String> getSqlByOriginalSql(SqlModel sqlModel) throws IllegalAccessException;
+
+    protected abstract String getTableName(String sql);
 }

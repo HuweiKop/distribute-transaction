@@ -18,11 +18,7 @@ public class InsertSqlAnalysis extends BaseAnalysis {
     public List<String> getSqlByOriginalSql(SqlModel sqlModel) throws IllegalAccessException {
         String insSql = sqlModel.getSqlText();
         Object param = sqlModel.getParam();
-        String[] tt = insSql.split("\\(");
-        if(tt.length<1){
-            throw new RuntimeException("sql 错误");
-        }
-        String tableName = tt[0].replaceAll("insert","").replaceAll("into","").trim();
+        String tableName = getTableName(insSql);
         for (Field field : param.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             if(field.getName().equals("id")){
@@ -36,5 +32,15 @@ public class InsertSqlAnalysis extends BaseAnalysis {
             }
         }
         throw new RuntimeException("sql 错误");
+    }
+
+    @Override
+    protected String getTableName(String sql) {
+        String[] tt = sql.split("\\(");
+        if(tt.length<1){
+            throw new RuntimeException("sql 错误");
+        }
+        String tableName = tt[0].replaceAll("insert","").replaceAll("into","").trim();
+        return tableName;
     }
 }

@@ -52,21 +52,35 @@ public class UpdateInterceptor implements Interceptor {
             paramNameList.add(mapping.getProperty());
         }
         sqlModel.setSqlCommandType(statement.getSqlCommandType());
+        sqlModel.setSqlText(boundSql.getSql());
+        sqlModel.setParam(parm);
         System.out.println(boundSql.getSql());
         System.out.println(statement.getSqlCommandType());
         System.out.println(JSONObject.toJSONString(parm));
-        Object result = invocation.proceed();
-        System.out.println(JSONObject.toJSONString(parm));
-        sqlModel.setSqlText(boundSql.getSql());
-        sqlModel.setParam(parm);
 
-        if(statement.getSqlCommandType()== SqlCommandType.INSERT){
-            BaseAnalysis analysis = new InsertSqlAnalysis();
-            analysis.getSqlByOriginalSql(sqlModel);
-        }else if(statement.getSqlCommandType()== SqlCommandType.UPDATE){
+        /**
+         * 更新需要获取 执行更新操作之前的数据
+         * 因此要在目标sql执行之前 获取rollback sql
+         */
+        if(statement.getSqlCommandType()== SqlCommandType.UPDATE){
             BaseAnalysis analysis = new UpdateSqlAnalysis();
             analysis.getSqlByOriginalSql(sqlModel);
         }
+
+        /**
+         * 执行目标真是 sql
+         */
+        Object result = invocation.proceed();
+
+        /**
+         * 插入操作需要获取，在插入操作之后，获取的自增Id
+         * 因此需要在目标sql执行之后 获取rollback sql
+         */
+        if(statement.getSqlCommandType()== SqlCommandType.INSERT){
+            BaseAnalysis analysis = new InsertSqlAnalysis();
+            analysis.getSqlByOriginalSql(sqlModel);
+        }
+
         System.out.println(JSONObject.toJSONString(sqlModel));
         return result;
     }

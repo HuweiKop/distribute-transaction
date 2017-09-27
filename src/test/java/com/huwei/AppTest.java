@@ -41,7 +41,7 @@ public class AppTest extends BaseTest {
 //        List<LinkedHashMap<String, Object>> map = api1.superSelect("select * from    user");
 
         try {
-            api1.update(10,"xxx");
+            api1.update(918,"xxxssxxxeeee");
         } catch (Exception e) {
             System.out.println("eeeeeeeeeeeeeeeeeeeee");
             e.printStackTrace();
