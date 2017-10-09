@@ -20,7 +20,6 @@ public class InsertSqlAnalysis extends BaseAnalysis {
         Object param = sqlModel.getParam();
         String tableName = getTableName(insSql);
         for (Field field : param.getClass().getDeclaredFields()) {
-            field.setAccessible(true);
             if(field.getName().equals("id")){
                 field.setAccessible(true);
                 String delSql = String.format("delete from %s where id=%s",tableName,field.get(param));

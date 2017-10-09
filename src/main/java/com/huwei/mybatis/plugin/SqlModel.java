@@ -17,6 +17,7 @@ public class SqlModel {
     private Object param;
     private String idName;
     private List<String> rollbackSqlList;
+    private String tableName;
 
     public SqlCommandType getSqlCommandType() {
         return sqlCommandType;
@@ -64,5 +65,13 @@ public class SqlModel {
 
     public void setRollbackSqlList(List<String> rollbackSqlList) {
         this.rollbackSqlList = rollbackSqlList;
+    }
+
+    public String getTableName() {
+        return tableName;
+    }
+
+    public void setTableName(String tableName) {
+        this.tableName = tableName;
     }
 }

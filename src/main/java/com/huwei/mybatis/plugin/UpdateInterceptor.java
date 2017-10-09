@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.huwei.ApplicationUtil;
 import com.huwei.dao.ISuperDao;
 import com.huwei.mybatis.sql.analysis.BaseAnalysis;
+import com.huwei.mybatis.sql.analysis.DeleteSqlAnalysis;
 import com.huwei.mybatis.sql.analysis.InsertSqlAnalysis;
 import com.huwei.mybatis.sql.analysis.UpdateSqlAnalysis;
 import org.apache.ibatis.executor.Executor;
@@ -64,6 +65,9 @@ public class UpdateInterceptor implements Interceptor {
          */
         if(statement.getSqlCommandType()== SqlCommandType.UPDATE){
             BaseAnalysis analysis = new UpdateSqlAnalysis();
+            analysis.getSqlByOriginalSql(sqlModel);
+        }else if(statement.getSqlCommandType()==SqlCommandType.DELETE){
+            BaseAnalysis analysis = new DeleteSqlAnalysis();
             analysis.getSqlByOriginalSql(sqlModel);
         }
 
