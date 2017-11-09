@@ -9,4 +9,6 @@ public class RedisKey {
 
     public static final String RetryList = "service::retry";
     public static final String RollbackList = "service::rollback";
+
+    public static final String TransactionRecord = "transaction:record";
 }

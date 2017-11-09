@@ -7,6 +7,7 @@ import com.huwei.mybatis.sql.analysis.BaseAnalysis;
 import com.huwei.mybatis.sql.analysis.DeleteSqlAnalysis;
 import com.huwei.mybatis.sql.analysis.InsertSqlAnalysis;
 import com.huwei.mybatis.sql.analysis.UpdateSqlAnalysis;
+import com.huwei.threadLocal.SqlThreadLocal;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -45,30 +46,31 @@ public class UpdateInterceptor implements Interceptor {
         sqlModel.setParamNameList(paramNameList);
 
         Object[] args = invocation.getArgs();
-        MappedStatement statement = (MappedStatement)args[0];
-        Object parm = args[1];
-        BoundSql boundSql = statement.getBoundSql(parm);
-        for (ParameterMapping mapping:boundSql.getParameterMappings()){
+        MappedStatement statement = (MappedStatement) args[0];
+        Object param = args[1];
+        BoundSql boundSql = statement.getBoundSql(param);
+        for (ParameterMapping mapping : boundSql.getParameterMappings()) {
             System.out.println(mapping.getProperty());
             paramNameList.add(mapping.getProperty());
         }
         sqlModel.setSqlCommandType(statement.getSqlCommandType());
         sqlModel.setSqlText(boundSql.getSql());
-        sqlModel.setParam(parm);
+        sqlModel.setParam(param);
         System.out.println(boundSql.getSql());
         System.out.println(statement.getSqlCommandType());
-        System.out.println(JSONObject.toJSONString(parm));
+        System.out.println(JSONObject.toJSONString(param));
 
+        List<String> sqlList = null;
         /**
          * 更新需要获取 执行更新操作之前的数据
          * 因此要在目标sql执行之前 获取rollback sql
          */
-        if(statement.getSqlCommandType()== SqlCommandType.UPDATE){
+        if (statement.getSqlCommandType() == SqlCommandType.UPDATE) {
             BaseAnalysis analysis = new UpdateSqlAnalysis();
-            analysis.getSqlByOriginalSql(sqlModel);
-        }else if(statement.getSqlCommandType()==SqlCommandType.DELETE){
+            sqlList = analysis.getSqlByOriginalSql(sqlModel);
+        } else if (statement.getSqlCommandType() == SqlCommandType.DELETE) {
             BaseAnalysis analysis = new DeleteSqlAnalysis();
-            analysis.getSqlByOriginalSql(sqlModel);
+            sqlList = analysis.getSqlByOriginalSql(sqlModel);
         }
 
         /**
@@ -80,9 +82,14 @@ public class UpdateInterceptor implements Interceptor {
          * 插入操作需要获取，在插入操作之后，获取的自增Id
          * 因此需要在目标sql执行之后 获取rollback sql
          */
-        if(statement.getSqlCommandType()== SqlCommandType.INSERT){
+        if (statement.getSqlCommandType() == SqlCommandType.INSERT) {
             BaseAnalysis analysis = new InsertSqlAnalysis();
-            analysis.getSqlByOriginalSql(sqlModel);
+            sqlList = analysis.getSqlByOriginalSql(sqlModel);
+        }
+
+        if (sqlList != null) {
+            List<String> sqlTL = SqlThreadLocal.get();
+            sqlTL.addAll(sqlList);
         }
 
         System.out.println(JSONObject.toJSONString(sqlModel));
