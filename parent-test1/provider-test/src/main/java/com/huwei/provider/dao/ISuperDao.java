@@ -1,11 +1,12 @@
-package com.huwei.dao;
+package com.huwei.provider.dao;
 
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: HuWei
@@ -17,5 +18,5 @@ import java.util.List;
 public interface ISuperDao {
 
     @Select("${sql}")
-    List<LinkedHashMap<String,Object>> superSelect(@Param("sql") String sql);
+    List<LinkedHashMap<String,Object>> superSelect(Map<String,String> map);
 }

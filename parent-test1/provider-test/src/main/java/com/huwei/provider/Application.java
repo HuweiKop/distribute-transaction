@@ -1,4 +1,4 @@
-package com.huwei;
+package com.huwei.provider;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -13,7 +13,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @EnableAsync
 @SpringBootApplication
-@ImportResource("classpath*:dubbo_consumer.xml")
+@ImportResource("classpath*:dubbo_provider.xml")
 @ServletComponentScan
 public class Application implements EmbeddedServletContainerCustomizer {
     public static void main(String[] args) {
@@ -22,6 +22,6 @@ public class Application implements EmbeddedServletContainerCustomizer {
 
     @Override
     public void customize(ConfigurableEmbeddedServletContainer configurableEmbeddedServletContainer) {
-        configurableEmbeddedServletContainer.setPort(9080);
+        configurableEmbeddedServletContainer.setPort(9081);
     }
 }

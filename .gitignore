@@ -1,0 +1,6 @@
+.idea/
+*.iml
+*.class
+parent-test1/provider-test/target/
+parent-test2/target/
+parent-test1/consumer-test/target/

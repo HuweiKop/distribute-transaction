@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  */
 
-package com.huwei.mybatis.config;
+package com.huwei.provider.mybatis.config;
 
 import com.alibaba.druid.pool.DruidDataSource;
 import com.huwei.mybatis.plugin.UpdateInterceptor;
@@ -91,12 +91,6 @@ public class MyBatisConfig implements TransactionManagementConfigurer {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
-//        try {
-//            return bean.getObject();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new RuntimeException(e);
-//        }
     }
 
 

@@ -2,17 +2,11 @@ package com.huwei.aspect;
 
 import com.alibaba.fastjson.JSON;
 import com.huwei.annotation.ServerAction;
-import com.huwei.annotation.SqlRecord;
 import com.huwei.annotation.TransactionId;
-import com.huwei.constant.ProcesStrategy;
 import com.huwei.constant.RedisKey;
 import com.huwei.constant.TransactionStatus;
-import com.huwei.distribute.transaction.MessageRecorder;
 import com.huwei.jedis.JedisHelper;
 import com.huwei.model.ServerActionModel;
-import com.huwei.model.TransactionInfoModel;
-import com.huwei.model.TransactionStatusModel;
-import com.huwei.threadLocal.TransactionInfoThreadLocal;
 import com.huwei.util.TransactionSqlMap;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -72,12 +66,13 @@ public class ServerActionAspect {
         try {
             Object result = jp.proceed();
             serverActionModel.setTransactionStatus(TransactionStatus.sucess);
-            serverActionModel.setSqlAction(TransactionSqlMap.getTransactionSql(serverActionModel.getTransactionId()));
+            serverActionModel.setSqlAction(TransactionSqlMap.get(serverActionModel.getTransactionId()));
+            TransactionSqlMap.remove(serverActionModel.getTransactionId());
             return result;
         } catch (Exception ex) {
             ex.printStackTrace();
 
-            serverActionModel.setTransactionStatus(TransactionStatus.sucess);
+            serverActionModel.setTransactionStatus(TransactionStatus.error);
             serverActionModel.setException(ex.getMessage());
         }finally {
             String json = JSON.toJSONString(serverActionModel);

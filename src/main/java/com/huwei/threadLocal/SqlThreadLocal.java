@@ -2,6 +2,7 @@ package com.huwei.threadLocal;
 
 import com.huwei.model.TransactionInfoModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,6 +19,10 @@ public class SqlThreadLocal {
     }
 
     public static List<String> get(){
-        return threadLocal.get();
+        List<String> list = threadLocal.get();
+        if(list==null){
+            list = new ArrayList<>();
+        }
+        return list;
     }
 }

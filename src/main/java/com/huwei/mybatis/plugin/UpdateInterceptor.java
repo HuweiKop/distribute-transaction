@@ -8,19 +8,21 @@ import com.huwei.mybatis.sql.analysis.DeleteSqlAnalysis;
 import com.huwei.mybatis.sql.analysis.InsertSqlAnalysis;
 import com.huwei.mybatis.sql.analysis.UpdateSqlAnalysis;
 import com.huwei.threadLocal.SqlThreadLocal;
+import com.huwei.threadLocal.TransactionIdTreadLocal;
+import com.huwei.util.TransactionSqlMap;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * @Author: HuWei
@@ -37,9 +39,18 @@ import java.util.Properties;
 @Component
 public class UpdateInterceptor implements Interceptor {
 
+    private SqlSessionTemplate sqlSessionTemplate;
+
+    public void setSqlSessionTemplate(SqlSessionTemplate sqlSessionTemplate){
+        this.sqlSessionTemplate = sqlSessionTemplate;
+    }
+
     public Object intercept(Invocation invocation) throws Throwable {
-        ISuperDao superDao = ApplicationUtil.getBean(ISuperDao.class);
-        superDao.superSelect("select * from user");
+//        ISuperDao superDao = ApplicationUtil.getBean(ISuperDao.class);
+//        superDao.superSelect("select * from user");
+        Map<String,String> map = new HashMap<>();
+        map.put("sql","select * from user");
+        Object o = sqlSessionTemplate.selectList("superSelect",map);
         System.out.println("intercept========================");
         SqlModel sqlModel = new SqlModel();
         List<String> paramNameList = new ArrayList<>();
@@ -90,6 +101,11 @@ public class UpdateInterceptor implements Interceptor {
         if (sqlList != null) {
             List<String> sqlTL = SqlThreadLocal.get();
             sqlTL.addAll(sqlList);
+
+            String transactionId = TransactionIdTreadLocal.get();
+            if(!StringUtils.isEmpty(transactionId)){
+                TransactionSqlMap.add(transactionId,sqlModel);
+            }
         }
 
         System.out.println(JSONObject.toJSONString(sqlModel));

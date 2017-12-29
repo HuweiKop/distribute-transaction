@@ -16,16 +16,25 @@ import java.util.concurrent.ConcurrentHashMap;
 public class TransactionSqlMap {
     private static Map<String, List<SqlModel>> map = new ConcurrentHashMap<>();
 
-    public static void initTransaction(String transactionId){
+    public static void initTransaction(String transactionId) {
         map.put(transactionId, new ArrayList<>());
     }
 
-    public static List<SqlModel> getTransactionSql(String transactionId){
-        return map.get(transactionId);
+    public static List<SqlModel> get(String transactionId) {
+        List<SqlModel> list = map.get(transactionId);
+        if (list == null) {
+            list = new ArrayList<>();
+            map.put(transactionId, list);
+        }
+        return list;
     }
 
-    public static void addSqlToTransaction(String transactionId, SqlModel sql){
+    public static void add(String transactionId, SqlModel sql) {
         List<SqlModel> list = map.get(transactionId);
         list.add(sql);
+    }
+
+    public static void remove(String transactionId) {
+        map.remove(transactionId);
     }
 }

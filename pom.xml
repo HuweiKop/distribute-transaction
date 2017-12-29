@@ -17,7 +17,11 @@
       </plugin>
     </plugins>
   </build>
-  <packaging>jar</packaging>
+    <modules>
+        <module>parent-test1</module>
+        <module>parent-test2</module>
+    </modules>
+    <packaging>pom</packaging>
 
   <name>distribute-transaction</name>
   <url>http://maven.apache.org</url>
@@ -48,6 +52,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.huwei</groupId>
+      <artifactId>api-test</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.10</version>
@@ -72,6 +81,11 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
       <version>${spring.version}</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.springframework/spring-tx -->
